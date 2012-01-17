@@ -1,11 +1,10 @@
-cytoDiv <- function(df, x.var="fsc_small", y.var="chl_small", Ncat = 16, do.plot=FALSE,...){
+cytoDiv <- function(df, x.var="fsc_small", y.var="chl_small", Ncat = 16, Nbit = 16, do.plot=FALSE,...){
 	
 	jet.colors <- colorRampPalette(c("white","red","red4","tomato4","black"))
 	filtered <- df
     
-
-        # Bin the bivariate data per categorie defined by Nbreks
-    dens <- KernSur(filtered[,x.var],filtered[,y.var], xgridsize= Ncat, ygridsize=Ncat, xbandwidth = (2^Ncat)/(Ncat), ybandwidth = (2^Ncat)/(Ncat), range.x=c(0,2^Ncat),range.y=c(0,2^Ncat),...)
+    # Bin the bivariate data per categorie defined by Ncat
+    dens <- KernSur(filtered[,x.var],filtered[,y.var], xgridsize= Ncat, ygridsize=Ncat, range.x=c(0,2^Nbit),range.y=c(0,2^Nbit),...)
 
 	# Plot the output 
     if(do.plot==TRUE){		
@@ -14,8 +13,9 @@ cytoDiv <- function(df, x.var="fsc_small", y.var="chl_small", Ncat = 16, do.plot
      		}
      	 
      	
-    p <- dens$zden/sum(dens$zden) # caculate probability per categorie
-	N0 <- sum(p^0) # Number of categorie
+    pi <- dens$zden/sum(dens$zden) # caculate probability per category
+	p <- pi[!(pi==0)] # remove empty category
+	N0 <- sum(p^0) # Number of categories
 	H <- - sum(p*log(p)) # Shannon-Wiener Diversity index H'
 	N2 <- sum(p^2) # Simpson's index
 	D <- 1 - N2 # Simpson's Index of Diversity
